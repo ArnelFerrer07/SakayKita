@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAKAY KITA | Login System</title>
+
+<style>
+* {
+box-sizing: border-box;
+font-family: Arial, sans-serif;
+}
+
+body {
+margin: 0;
+min-height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+background: #eaf5ed;
+padding: 20px;
+}
+
+.container {
+width: 100%;
+max-width: 420px;
+background: white;
+padding: 28px;
+border-radius: 18px;
+box-shadow: 0 6px 25px #00000015;
+}
+
+.logo {
+text-align: center;
+color: #087c45;
+font-size: 29px;
+font-weight: bold;
+margin-bottom: 8px;
+}
+
+.subtitle {
+text-align: center;
+color: #66756b;
+margin-bottom: 25px;
+}
+
+h2 {
+color: #087c45;
+margin-top: 0;
+}
+
+label {
+display: block;
+margin: 14px 0 6px;
+font-weight: bold;
+font-size: 14px;
+}
+
+input, select {
+width: 100%;
+padding: 12px;
+border: 1px solid #ccd9cf;
+border-radius: 8px;
+font-size: 15px;
+background: white;
+}
+
+button {
+width: 100%;
+padding: 13px;
+margin-top: 16px;
+border: none;
+border-radius: 8px;
+background: #087c45;
+color: white;
+font-size: 16px;
+font-weight: bold;
+cursor: pointer;
+}
+
+button:hover {
+background: #056337;
+}
+
+.continue-btn {
+display: block;
+width: 100%;
+margin-top: 18px;
+margin-bottom: 10px;
+text-align: center;
+text-decoration: none;
+}
+
+.switch {
+text-align: center;
+margin-top: 18px;
+font-size: 14px;
+}
+
+.switch a {
+color: #087c45;
+font-weight: bold;
+cursor: pointer;
+}
+
+.message {
+margin-top: 12px;
+font-size: 14px;
+line-height: 1.5;
+}
+
+.hidden {
+display: none !important;
+}
+
+.dashboard {
+text-align: center;
+}
+
+.role {
+display: inline-block;
+background: #e5f5e9;
+color: #087c45;
+border-radius: 20px;
+padding: 7px 12px;
+font-weight: bold;
+font-size: 13px;
+margin: 10px 0;
+}
+
+.note {
+color: #6b776e;
+font-size: 12px;
+line-height: 1.5;
+margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo"> SAKAY KITA</div>
+<p class="subtitle">Safe Rides. Faster Trips. Together.</p>
+
+<!-- LOGIN FORM -->
+<section id="loginSection">
+<h2>Log In</h2>
+
+<form id="loginForm">
+<label for="loginEmail">Email Address</label>
+<input
+id="loginEmail"
+type="email"
+placeholder="Enter your email"
+autocomplete="username"
+required
+>
+
+<label for="loginPassword">Password</label>
+<input
+id="loginPassword"
+type="password"
+placeholder="Enter your password"
+autocomplete="current-password"
+required
+>
+
+<label for="loginRole">Log in as</label>
+<select id="loginRole" required>
+<option value="passenger">Student / Passenger</option>
+<option value="driver">Driver</option>
+</select>
+
+<button type="submit">Log In</button>
+<p id="loginMessage" class="message" aria-live="polite"></p>
+</form>
+
+<p class="switch">
+Don't have an account?
+<a onclick="showRegister()">Create Account</a>
+</p>
+</section>
+
+<!-- REGISTRATION FORM -->
+<section id="registerSection" class="hidden">
+<h2>Create Account</h2>
+
+<form id="registerForm">
+<label for="fullName">Full Name</label>
+<input
+id="fullName"
+type="text"
+placeholder="Enter your full name"
+autocomplete="name"
+required
+>
+
+<label for="registerEmail">Email Address</label>
+<input
+id="registerEmail"
+type="email"
+placeholder="Enter your email"
+autocomplete="email"
+required
+>
+
+<label for="registerPassword">Password</label>
+<input
+id="registerPassword"
+type="password"
+placeholder="At least 8 characters"
+minlength="8"
+autocomplete="new-password"
+required
+>
+
+<label for="registerRole">Account Type</label>
+<select id="registerRole" onchange="toggleDriverFields()" required>
+<option value="passenger">Student / Passenger</option>
+<option value="driver">Driver</option>
+</select>
+
+<div id="driverFields" class="hidden">
+<label for="plateNumber">Tricycle Plate Number</label>
+<input
+id="plateNumber"
+type="text"
+placeholder="Enter tricycle plate number"
+autocomplete="off"
+>
+</div>
+
+<button type="submit">Register</button>
+<p id="registerMessage" class="message" aria-live="polite"></p>
+</form>
+
+<p class="switch">
+Already have an account?
+<a onclick="showLogin()">Log In</a>
+</p>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboardSection" class="dashboard hidden">
+<h2>Welcome to SAKAY KITA!</h2>
+<p id="welcomeName"></p>
+<div id="welcomeRole" class="role"></div>
+<p id="dashboardDetails"></p>
+
+
+<button id="continueButton" class="continue-btn" type="button" onclick="continueToBooking()">
+Continue to Ride Booking
+</button>
+
+<button type="button" onclick="logout()">Log Out</button>
+
+<p class="note">
+Student/Passenger accounts can be used for ride booking.
+Driver accounts are intended for drivers operating tricycles.
+This sample is for demonstration only.
+</p>
+
+</div>
+
+<script>
+/*
+DEMO ONLY:
+This example uses browser storage and is not safe for real accounts.
+Do not use real passwords or sensitive personal information.
+A deployed app should use a secure backend and password hashing.
+*/
+
+const USERS_KEY = "sakayKitaDemoUsers";
+const ACTIVE_USER_KEY = "sakayKitaActiveUser";
+let currentUser = null;
+
+function getUsers() {
+try {
+return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+} catch {
+return [];
+}
+}
+
+function saveUsers(users) {
+localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function showLogin() {
+document.getElementById("loginSection").classList.remove("hidden");
+document.getElementById("registerSection").classList.add("hidden");
+document.getElementById("dashboardSection").classList.add("hidden");
+clearMessages();
+}
+
+function showRegister() {
+document.getElementById("loginSection").classList.add("hidden");
+document.getElementById("registerSection").classList.remove("hidden");
+document.getElementById("dashboardSection").classList.add("hidden");
+clearMessages();
+toggleDriverFields();
+}
+
+function clearMessages() {
+document.getElementById("loginMessage").textContent = "";
+document.getElementById("registerMessage").textContent = "";
+}
+
+function toggleDriverFields() {
+const isDriver =
+document.getElementById("registerRole").value === "driver";
+
+document.getElementById("driverFields")
+.classList.toggle("hidden", !isDriver);
+
+document.getElementById("plateNumber").required = isDriver;
+}
+
+document.getElementById("registerForm")
+.addEventListener("submit", function(event) {
+event.preventDefault();
+
+const name = document.getElementById("fullName").value.trim();
+const email = document.getElementById("registerEmail")
+.value.trim().toLowerCase();
+const password = document.getElementById("registerPassword").value;
+const role = document.getElementById("registerRole").value;
+const plateNumber = document.getElementById("plateNumber")
+.value.trim().toUpperCase();
+
+const message = document.getElementById("registerMessage");
+
+if (password.length < 8) {
+message.style.color = "#b42318";
+message.textContent = "Password must be at least 8 characters.";
+return;
+}
+
+if (role === "driver" && !plateNumber) {
+message.style.color = "#b42318";
+message.textContent = "Please enter your tricycle plate number.";
+return;
+}
+
+const users = getUsers();
+
+if (users.some(user => user.email === email)) {
+message.style.color = "#b42318";
+message.textContent =
+"This email is already registered. Please log in.";
+return;
+}
+
+const user = {
+id: "SK" + Date.now(),
+name,
+email,
+password,
+role,
+plateNumber: role === "driver" ? plateNumber : ""
+};
+
+users.push(user);
+
+try {
+saveUsers(users);
+} catch {
+message.style.color = "#b42318";
+message.textContent =
+"Could not save the account in this browser.";
+return;
+}
+
+message.style.color = "#087c45";
+message.textContent = "Account created successfully!";
+
+currentUser = user;
+localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
+setTimeout(showDashboard, 300);
+});
+
+document.getElementById("loginForm")
+.addEventListener("submit", function(event) {
+event.preventDefault();
+
+const email = document.getElementById("loginEmail")
+.value.trim().toLowerCase();
+const password = document.getElementById("loginPassword").value;
+const role = document.getElementById("loginRole").value;
+
+const user = getUsers().find(item =>
+item.email === email &&
+item.password === password &&
+item.role === role
+);
+
+const message = document.getElementById("loginMessage");
+
+if (!user) {
+message.style.color = "#b42318";
+message.textContent =
+"Invalid login details. Check your email, password, and account type.";
+return;
+}
+
+currentUser = user;
+localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(currentUser));
+showDashboard();
+});
+
+function showDashboard() {
+document.getElementById("loginSection").classList.add("hidden");
+document.getElementById("registerSection").classList.add("hidden");
+document.getElementById("dashboardSection").classList.remove("hidden");
+
+document.getElementById("welcomeName").textContent =
+"Hello, " + currentUser.name + "!";
+
+const isDriver = currentUser.role === "driver";
+
+document.getElementById("welcomeRole").textContent =
+isDriver ? "DRIVER" : "STUDENT / PASSENGER";
+
+document.getElementById("dashboardDetails").textContent =
+isDriver
+? "Tricycle Plate Number: " + currentUser.plateNumber +
+". Your driver account is ready for the demo."
+: "Your passenger account is ready. You can continue to the ride-booking interface.";
+}
+
+function continueToBooking() {
+if (!currentUser) {
+showLogin();
+return;
+}
+
+window.location.href = "login.html";
+}
+
+function logout() {
+currentUser = null;
+localStorage.removeItem(ACTIVE_USER_KEY);
+document.getElementById("loginForm").reset();
+document.getElementById("registerForm").reset();
+toggleDriverFields();
+showLogin();
+}
+
+toggleDriverFields();
+</script>
+
+</body>
+</html>
