@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAKAY KITA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f2f7f3;
+  color: #24352a;
+}
+
+header {
+  background: #078449;
+  color: white;
+  padding: 22px 16px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 28px;
+}
+
+header p {
+  margin-top: 6px;
+}
+
+.container {
+  max-width: 540px;
+  margin: 20px auto;
+  padding: 15px;
+}
+
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 3px 12px #0000000d;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #078449;
+}
+
+label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d5e1d8;
+  border-radius: 9px;
+  background: white;
+  font-size: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  background: #078449;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #056b3b;
+}
+
+button.secondary {
+  background: #e6f4eb;
+  color: #078449;
+}
+
+button.small {
+  width: auto;
+  padding: 10px 12px;
+  margin: 0;
+}
+
+.passenger-option {
+  min-width: 120px;
+  margin: 4px 0;
+}
+
+.passenger-option.selected {
+  background: #078449;
+  color: white;
+  border: 1px solid #078449;
+}
+
+.map-container {
+  width: 100%;
+  height: 300px;
+  margin: 12px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e5eee7;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+}
+
+.map-marker {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #078449;
+  box-shadow: 0 2px 6px #00000055;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.map-marker.destination {
+  background: #b42318;
+}
+
+.map-note {
+  font-size: 12px;
+  color: #718077;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.map-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.map-actions button {
+  flex: 1;
+  min-width: 135px;
+}
+
+.vehicle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 2px solid #078449;
+  background: #effaf3;
+  border-radius: 12px;
+}
+
+.vehicle-icon {
+  font-size: 36px;
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+.vehicle-info p {
+  color: #718077;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.fare {
+  font-weight: bold;
+  color: #078449;
+  text-align: right;
+}
+
+.fare-note {
+  display: block;
+  margin-top: 4px;
+  color: #718077;
+  font-size: 11px;
+  font-weight: normal;
+  text-align: right;
+}
+
+.fare-help {
+  margin-top: 8px;
+  color: #718077;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.waiting-time {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: #effaf3;
+  color: #078449;
+  font-weight: bold;
+}
+
+.driver-action {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #d5e1d8;
+}
+
+.chat-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #d5e1d8;
+}
+
+.chat-messages {
+  display: flex;
+  max-height: 280px;
+  min-height: 100px;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #d5e1d8;
+  border-radius: 10px;
+  background: #f7faf8;
+}
+
+.chat-empty {
+  margin: auto;
+  color: #718077;
+  font-size: 13px;
+  text-align: center;
+}
+
+.chat-message {
+  max-width: 85%;
+  padding: 9px 11px;
+  border-radius: 11px;
+  background: white;
+  overflow-wrap: anywhere;
+  box-shadow: 0 1px 3px #00000012;
+}
+
+.chat-message.own {
+  align-self: flex-end;
+  background: #e5f5e9;
+}
+
+.chat-message strong,
+.chat-message time {
+  display: block;
+  font-size: 11px;
+}
+
+.chat-message time {
+  margin-top: 5px;
+  color: #718077;
+}
+
+.chat-message p {
+  margin-top: 4px;
+  white-space: pre-wrap;
+}
+
+.chat-compose {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chat-compose input {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-compose button {
+  width: auto;
+  min-width: 88px;
+  margin-top: 0;
+}
+
+.logout-dialog {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #00000066;
+}
+
+.logout-dialog-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 22px;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 8px 24px #0000002b;
+  text-align: center;
+}
+
+.logout-dialog-card p {
+  margin-top: 8px;
+  color: #718077;
+}
+
+.logout-dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.logout-dialog-actions button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.logout-dialog-actions .no-button {
+  background: #e6f4eb;
+  color: #078449;
+}
+
+button.decline {
+  background: #fff0ef;
+  color: #b42318;
+}
+
+button.decline:hover {
+  background: #fbd8d5;
+}
+
+.result {
+  display: none;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.profile-field {
+  padding: 12px;
+  border-radius: 9px;
+  background: #f2f7f3;
+}
+
+.profile-field strong,
+.profile-field span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.profile-field span {
+  margin-top: 4px;
+  color: #53645a;
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+}
+
+.history-item {
+  padding: 14px;
+  border: 1px solid #d5e1d8;
+  border-radius: 10px;
+}
+
+.history-item p + p {
+  margin-top: 5px;
+}
+
+.history-status {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border-radius: 16px;
+  background: #e6f4eb;
+  color: #078449;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  background: white;
+  padding: 14px 5px;
+  position: sticky;
+  bottom: 0;
+  box-shadow: 0 -2px 10px #0000000d;
+}
+
+nav button {
+  width: auto;
+  background: transparent;
+  color: #078449;
+  padding: 8px;
+  margin: 0;
+  font-size: 13px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #7b8b80;
+  font-size: 12px;
+}
+
+@media(max-width: 380px) {
+  .card { padding: 15px; }
+  .map-container { height: 250px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>SAKAY KITA</h1>
+  <p>Safe Rides. Faster Trips. Together.</p>
+</header>
+
+<main class="container">
+
+  <section class="card" id="profileCard">
+    <h2>My Profile</h2>
+    <div class="profile-details">
+      <div class="profile-field"><strong>Name</strong><span id="profileName">Loading…</span></div>
+      <div class="profile-field"><strong>Email</strong><span id="profileEmail">Loading…</span></div>
+      <div class="profile-field"><strong>Account type</strong><span id="profileRole">Loading…</span></div>
+      <div class="profile-field" id="profilePlateField" style="display: none;">
+        <strong>Tricycle plate number</strong><span id="profilePlate"></span>
+      </div>
+      <div class="profile-field" id="driverTripCountField" style="display: none;">
+        <strong>Successful deliveries</strong><span id="driverTripCount">0</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="rideHistoryCard">
+    <h2 id="rideHistoryTitle">Ride History</h2>
+    <p id="rideHistoryEmpty" class="map-note">Loading ride history…</p>
+    <div id="rideHistoryList" class="history-list"></div>
+  </section>
+
+  <section class="card" id="map-location">
+    <h2>MAP LOCATION</h2>
+    <p class="map-note" id="mapInstructions">
+      Search a pickup or destination, choose which location to pin on the map,
+      or drag the markers to adjust locations.
+    </p>
+
+    <label for="pickup">Pickup Location</label>
+    <input id="pickup" type="text" placeholder="Search pickup location">
+
+    <div class="map-actions">
+      <button type="button" class="small secondary"
+        onclick="selectMapLocation('pickup')">
+        Choose Pickup on Map
+      </button>
+      <button type="button" class="small secondary"
+        onclick="useMyLocation()">
+        Use My Current Location
+      </button>
+
+      <button type="button" class="small secondary"
+        onclick="searchPickup()">
+        Show Pickup on Map
+      </button>
+    </div>
+
+    <label for="destination">Destination</label>
+    <input id="destination" type="text"
+      placeholder="Where are you going?">
+
+    <div class="map-actions">
+      <button type="button" class="small secondary"
+        onclick="selectMapLocation('destination')">
+        Choose Destination on Map
+      </button>
+      <button type="button" class="small secondary"
+        onclick="searchDestination()">
+        Show Destination on Map
+      </button>
+
+      <button type="button" class="small secondary"
+        onclick="clearDestination()">
+        Clear Destination
+      </button>
+    </div>
+
+    <div class="map-container">
+      <div id="map" aria-label="Interactive map"></div>
+    </div>
+
+    <p class="map-note" id="mapStatus">Loading the built-in map…</p>
+
+    <p class="map-note">Map data © OpenStreetMap contributors. Booking updates appear live for passenger and driver.</p>
+  </section>
+
+  <section class="card" id="vehicleFareCard">
+    <h2>Choose Your Vehicle</h2>
+
+    <div class="vehicle">
+      <div class="vehicle-icon">🛺</div>
+      <div class="vehicle-info">
+        <strong>Tricycle</strong>
+        <p>Local transport • Convenient ride</p>
+      </div>
+      <div class="fare">
+        <span id="fareDisplay">₱20.00</span>
+        <span class="fare-note" id="fareNote">for 1 passenger</span>
+      </div>
+    </div>
+    <p class="fare-help" id="distanceFareNote">
+      Fare starts at ₱20.00 and changes based on the pickup-to-destination distance.
+    </p>
+    <label for="driverFare">Driver-set fare (optional)</label>
+    <input
+      id="driverFare"
+      type="number"
+      min="20"
+      step="5"
+      placeholder="Leave blank for automatic distance fare"
+      oninput="updateFareDisplay()"
+    >
+    <p class="fare-help">
+      If the driver enters a fare, it will replace the automatic distance fare.
+    </p>
+  </section>
+
+  <section class="card" id="passengerBookingCard">
+    <h2>Passenger</h2>
+    <p class="map-note" id="bookingRoleNote"></p>
+    <p class="map-note">How many passengers will ride with you?</p>
+
+    <label for="passengerName">Passenger name (from your profile)</label>
+    <input
+      id="passengerName"
+      type="text"
+      maxlength="80"
+      placeholder="Name from your profile"
+      autocomplete="name"
+      readonly
+      required
+    >
+
+    <label for="passengerCount">Number of passengers</label>
+    <input
+      id="passengerCount"
+      type="number"
+      min="1"
+      max="10"
+      step="1"
+      placeholder="Enter number of passengers"
+      required
+      oninput="handlePassengerInput(this.value)"
+    >
+
+    <p id="selectedPassengerText" class="fare-help" aria-live="polite">Enter a whole number from 1 to 10.</p>
+
+    <label for="payment">Payment</label>
+    <input id="payment" type="text" value="Cash" readonly>
+
+    <button id="bookRideButton" onclick="bookRide()">Book Tricycle</button>
+  </section>
+
+  <section class="card result" id="confirmation">
+    <h2>Booking Confirmation</h2>
+    <p><strong>Booking ID:</strong> <span id="bookingId"></span></p>
+    <p><strong>Vehicle:</strong> Tricycle 🛺</p>
+    <p><strong>Passenger name:</strong> <span id="showPassengerName"></span></p>
+    <p><strong>Passengers:</strong> <span id="showPassengers"></span></p>
+    <p><strong>Driver:</strong> <span id="showDriverName">Not assigned yet</span></p>
+    <p><strong>Pickup:</strong> <span id="showPickup"></span></p>
+    <p><strong>Destination:</strong> <span id="showDestination"></span></p>
+    <p><strong>Payment:</strong> <span id="showPayment"></span></p>
+    <p><strong>Estimated Fare:</strong> <span id="estimatedFare">₱20.00</span></p>
+    <p><strong>Status:</strong> <span id="showStatus"></span></p>
+    <p id="completedMessage" class="role" style="display: none;">Ride completed successfully!</p>
+    <p id="waitingTime" class="waiting-time" style="display: none;" aria-live="polite"></p>
+    <div id="driverAcceptance" class="driver-action">
+      <label for="driverName">Driver name</label>
+      <input
+        id="driverName"
+        type="text"
+        maxlength="80"
+        placeholder="Enter driver's name"
+        autocomplete="name"
+        required
+      >
+      <label for="driverWaitMinutes">Driver arrival time (minutes)</label>
+      <input
+        id="driverWaitMinutes"
+        type="number"
+        min="1"
+        max="120"
+        step="1"
+        placeholder="Leave blank for automatic estimate"
+      >
+      <p class="fare-help">
+        Accept the booking and provide how many minutes the passenger will wait.
+      </p>
+      <button type="button" onclick="acceptBooking()">Accept Booking</button>
+      <button type="button" class="decline" onclick="declineBooking()">Decline Booking</button>
+    </div>
+    <button id="completeRideButton" type="button" onclick="completeRide()">Mark as Delivered</button>
+    <button id="cancelBookingButton" class="secondary" onclick="cancelRide()">Cancel Booking</button>
+    <section id="rideChatSection" class="chat-section hidden" aria-labelledby="rideChatTitle">
+      <h2 id="rideChatTitle">Ride Chat</h2>
+      <p class="map-note">You are chatting with <strong id="chatPartnerName"></strong> (<span id="chatPartnerRole"></span>).</p>
+      <div id="chatMessages" class="chat-messages" role="log" aria-live="polite">
+        <p id="chatEmpty" class="chat-empty">Loading messages…</p>
+      </div>
+      <form id="chatForm" class="chat-compose">
+        <label class="hidden" for="chatInput">Message</label>
+        <input id="chatInput" type="text" maxlength="1000"
+          placeholder="Write a message…" autocomplete="off" required>
+        <button id="chatSendButton" type="submit">Send</button>
+      </form>
+      <p id="chatStatus" class="message" aria-live="polite"></p>
+    </section>
+  </section>
+
+  <section class="card" id="booking-information" style="display: none;">
+    <h2>Booking Information</h2>
+    <p><strong>Passenger:</strong> <span id="driverBookingPassenger"></span></p>
+    <p><strong>Pickup:</strong> <span id="driverBookingPickup"></span></p>
+    <p><strong>Destination:</strong> <span id="driverBookingDestination"></span></p>
+    <p><strong>Passengers:</strong> <span id="driverBookingPassengers"></span></p>
+    <p><strong>Payment:</strong> <span id="driverBookingPayment"></span></p>
+    <p><strong>Fare:</strong> <span id="driverBookingFare"></span></p>
+    <p><strong>Status:</strong> <span id="driverBookingStatus"></span></p>
+  </section>
+
+  <section class="card" id="payment-options">
+    <h2>Payment Method: Cash Only</h2>
+  </section>
+
+</main>
+
+<nav>
+  <button type="button" onclick="goHome()">← Back</button>
+  <button id="bookingInformationNav" type="button" onclick="showActivity()">▤ Booking Information</button>
+  <button type="button" onclick="showLogoutDialog()">⇥ Logout</button>
+</nav>
+
+<div id="logoutDialog" class="logout-dialog" role="dialog" aria-modal="true" aria-labelledby="logoutDialogTitle">
+  <div class="logout-dialog-card">
+    <h2 id="logoutDialogTitle">Logout</h2>
+    <p>Are you sure you want to logout?</p>
+    <div class="logout-dialog-actions">
+      <button type="button" onclick="confirmLogout()">Yes</button>
+      <button type="button" class="no-button" onclick="closeLogoutDialog()">No</button>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 SAKAY KITA. All rights reserved.</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const firebaseServices = window.sakayKitaFirebase;
+const LOCAL_ACCOUNTS_KEY = "sakayKitaLocalAccounts";
+const LOCAL_SESSION_KEY = "sakayKitaLocalSession";
+const LOCAL_BOOKINGS_KEY = "sakayKitaLocalBookings";
+
+let map, pickupMarker, destinationMarker;
+let pickupCoords = null;
+let destinationCoords = null;
+let currentBooking = null;
+let selectedPassengerCount = 1;
+let waitingTimer = null;
+let activeUser = null;
+let previousSectionId = "map-location";
+let bookingUnsubscribers = [];
+let bookingSnapshots = new Map();
+let mapSelection = "destination";
+let pickupManuallySet = false;
+let pickupLocationRequestId = 0;
+let chatUnsubscribe = null;
+let chatBookingId = null;
+const WAITING_BOOKING_STATUS = "Waiting for driver confirmation";
+
+function getLocalAccounts() {
+  const accounts = JSON.parse(localStorage.getItem(LOCAL_ACCOUNTS_KEY) || "[]");
+  if (!Array.isArray(accounts)) {
+    throw new Error("The saved local accounts are invalid.");
+  }
+  return accounts;
+}
+
+function getLocalBookings() {
+  const bookings = JSON.parse(localStorage.getItem(LOCAL_BOOKINGS_KEY) || "[]");
+  if (!Array.isArray(bookings)) {
+    throw new Error("The saved local bookings are invalid.");
+  }
+  return bookings;
+}
+
+function saveLocalBookings(bookings) {
+  localStorage.setItem(LOCAL_BOOKINGS_KEY, JSON.stringify(bookings));
+}
+
+function updateLocalBooking(bookingId, changes, validate) {
+  const bookings = getLocalBookings();
+  const bookingIndex = bookings.findIndex(booking => booking.id === bookingId);
+  if (bookingIndex < 0) {
+    throw new Error("This booking is no longer available.");
+  }
+
+  if (validate) validate(bookings[bookingIndex]);
+
+  const booking = {
+    ...bookings[bookingIndex],
+    ...changes,
+    updatedAt: Date.now()
+  };
+  bookings[bookingIndex] = booking;
+  saveLocalBookings(bookings);
+  applyLocalBookings();
+  return booking;
+}
+
+function applyLocalBookings() {
+  applyBookings(getLocalBookings());
+}
+
+function isDriverUser() {
+  return activeUser && activeUser.role === "driver";
+}
+
+function applyUserRole() {
+  const driverUser = isDriverUser();
+  const passengerNameInput = document.getElementById("passengerName");
+  const driverNameInput = document.getElementById("driverName");
+  const roleNote = document.getElementById("bookingRoleNote");
+  document.getElementById("profileName").textContent = activeUser?.name || "Not provided";
+  document.getElementById("profileEmail").textContent = activeUser?.email || "Not provided";
+  document.getElementById("profileRole").textContent = driverUser
+    ? "Driver"
+    : "Student / Passenger";
+  document.getElementById("profilePlateField").style.display =
+    driverUser && activeUser.plateNumber ? "block" : "none";
+  document.getElementById("profilePlate").textContent = activeUser?.plateNumber || "";
+  document.getElementById("driverTripCountField").style.display =
+    driverUser ? "block" : "none";
+  document.getElementById("rideHistoryTitle").textContent =
+    driverUser ? "Booking History" : "Ride History";
+
+  if (passengerNameInput) {
+    passengerNameInput.value =
+      activeUser && !driverUser && typeof activeUser.name === "string"
+        ? activeUser.name
+        : "";
+  }
+
+  if (driverNameInput && driverUser) {
+    driverNameInput.value = activeUser.name || "";
+    driverNameInput.readOnly = true;
+  }
+
+  if (roleNote) {
+    roleNote.textContent = driverUser
+      ? "Driver mode: review the passenger booking and accept it with your estimated arrival time."
+      : "Passenger mode: your profile name will appear on the booking and be shown to the driver.";
+  }
+
+  document.getElementById("bookRideButton").style.display = driverUser ? "none" : "block";
+  document.getElementById("driverAcceptance").style.display = driverUser ? "block" : "none";
+  document.getElementById("map-location").style.display = driverUser ? "none" : "block";
+  document.getElementById("vehicleFareCard").style.display = driverUser ? "none" : "block";
+  document.getElementById("passengerBookingCard").style.display = driverUser ? "none" : "block";
+  document.getElementById("cancelBookingButton").style.display = driverUser ? "none" : "block";
+  document.getElementById("booking-information").style.display = "none";
+  document.getElementById("bookingInformationNav").style.display = driverUser ? "block" : "none";
+  document.getElementById("profileCard").style.display = "block";
+  document.getElementById("rideHistoryCard").style.display = "block";
+  document.querySelectorAll("#map-location .map-actions").forEach(actions => {
+    actions.style.display = driverUser ? "none" : "flex";
+  });
+  if (driverUser) {
+    document.getElementById("map-location").style.display = "block";
+    document.getElementById("mapInstructions").textContent =
+      "Driver map: passenger pickup and destination are read-only. Log in with a Student / Passenger account to enter locations and book a ride.";
+    document.getElementById("pickup").readOnly = true;
+    document.getElementById("destination").readOnly = true;
+  }
+}
+
+function handlePassengerInput(value) {
+  const selectedPassengerText = document.getElementById("selectedPassengerText");
+
+  if (value.trim() === "") {
+    selectedPassengerCount = 1;
+    selectedPassengerText.textContent = "Enter a whole number from 1 to 10.";
+    selectedPassengerText.style.color = "#718077";
+    updateFareDisplay();
+    return;
+  }
+
+  const count = Number(value);
+
+  if (!Number.isInteger(count) || count < 1 || count > 10) {
+    selectedPassengerCount = 1;
+    selectedPassengerText.textContent = "Enter a whole number from 1 to 10.";
+    selectedPassengerText.style.color = "#b42318";
+    updateFareDisplay();
+    return;
+  }
+
+  selectedPassengerCount = count;
+  selectedPassengerText.textContent =
+    `Selected: ${count} passenger${count > 1 ? "s" : ""}`;
+  selectedPassengerText.style.color = "#078449";
+
+  updateFareDisplay();
+}
+
+function getSelectedPassengerCount() {
+  return selectedPassengerCount;
+}
+
+function haversineDistance(a, b) {
+  const toRadians = value => (value * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const dLat = toRadians(b.lat - a.lat);
+  const dLng = toRadians(b.lng - a.lng);
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+
+  const hav =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLng / 2) * Math.sin(dLng / 2) * Math.cos(lat1) * Math.cos(lat2);
+
+  return 2 * earthRadiusKm * Math.atan2(Math.sqrt(hav), Math.sqrt(1 - hav));
+}
+
+function estimateFare() {
+  const baseFare = 20;
+  const driverFareInput = document.getElementById("driverFare");
+  const driverFare = Number(driverFareInput.value);
+
+  if (driverFareInput.value.trim() && Number.isFinite(driverFare) && driverFare >= baseFare) {
+    return Math.round(driverFare / 5) * 5;
+  }
+
+  if (pickupCoords && destinationCoords) {
+    const distanceKm = haversineDistance(pickupCoords, destinationCoords);
+    const dynamicFare = baseFare + Math.max(0, distanceKm - 1) * 10;
+    return Math.round(dynamicFare / 5) * 5;
+  }
+
+  const pickupText = document.getElementById("pickup").value.toLowerCase();
+  const destinationText = document.getElementById("destination").value.toLowerCase();
+  const combinedText = `${pickupText} ${destinationText}`;
+
+  let fare = baseFare;
+
+  if (combinedText.includes("school") || combinedText.includes("market") || combinedText.includes("terminal")) {
+    fare += 20;
+  }
+
+  if (combinedText.includes("barangay") || combinedText.includes("subdivision") || combinedText.includes("highway")) {
+    fare += 30;
+  }
+
+  return fare;
+}
+
+function updateFareDisplay() {
+  const fare = estimateFare();
+  const passengerCount = getSelectedPassengerCount();
+  const totalFare = fare * passengerCount;
+  const formattedFare = `₱${totalFare.toFixed(2)}`;
+  const driverFareInput = document.getElementById("driverFare");
+  const enteredDriverFare = Number(driverFareInput.value);
+  const hasDriverFare =
+    driverFareInput.value.trim() !== "" &&
+    Number.isFinite(enteredDriverFare) &&
+    enteredDriverFare >= 20;
+
+  const fareDisplay = document.getElementById("fareDisplay");
+  if (fareDisplay) fareDisplay.textContent = formattedFare;
+
+  const fareNote = document.getElementById("fareNote");
+  if (fareNote) {
+    fareNote.textContent =
+      `${hasDriverFare ? "Driver-set" : "₱" + fare.toFixed(2) + " each"} • ` +
+      `${passengerCount} passenger${passengerCount > 1 ? "s" : ""}`;
+  }
+
+  const distanceFareNote = document.getElementById("distanceFareNote");
+  if (distanceFareNote) {
+    distanceFareNote.textContent = hasDriverFare
+      ? "The driver-set fare is being used for this ride."
+      : pickupCoords && destinationCoords
+        ? `Automatic fare based on approximately ${haversineDistance(pickupCoords, destinationCoords).toFixed(2)} km distance.`
+        : "Fare starts at ₱20.00 and changes when pickup and destination coordinates are available.";
+  }
+
+  const estimatedFare = document.getElementById("estimatedFare");
+  if (estimatedFare) estimatedFare.textContent = formattedFare;
+
+  return totalFare;
+}
+
+function setMapStatus(message) {
+  document.getElementById("mapStatus").textContent = message;
+}
+
+function initMap() {
+  const defaultCenter = { lat: 15.5889, lng: 120.9197 };
+  map = L.map("map").setView([defaultCenter.lat, defaultCenter.lng], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>"
+  }).addTo(map);
+
+  pickupMarker = L.marker([defaultCenter.lat, defaultCenter.lng], {
+    draggable: !isDriverUser(),
+    icon: createMapIcon("P", "pickup")
+  });
+  destinationMarker = L.marker([defaultCenter.lat, defaultCenter.lng], {
+    draggable: !isDriverUser(),
+    icon: createMapIcon("D", "destination")
+  });
+
+  pickupMarker.on("dragend", event => {
+    const position = event.target.getLatLng();
+    setLocationFromCoordinates({ lat: position.lat, lng: position.lng }, "pickup");
+  });
+  destinationMarker.on("dragend", event => {
+    const position = event.target.getLatLng();
+    setLocationFromCoordinates({ lat: position.lat, lng: position.lng }, "destination");
+  });
+  if (!isDriverUser()) {
+    map.on("click", event => {
+      setLocationFromCoordinates(
+        { lat: event.latlng.lat, lng: event.latlng.lng },
+        mapSelection
+      );
+      mapSelection = "destination";
+    });
+  }
+
+  setMapStatus("Map ready. Search an address or choose which location to pin.");
+  showBookingOnMap();
+}
+
+function createMapIcon(label, kind) {
+  return L.divIcon({
+    className: "",
+    html: `<span class="map-marker ${kind === "destination" ? "destination" : ""}">${label}</span>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+}
+
+function selectMapLocation(which) {
+  mapSelection = which;
+  setMapStatus(
+    `Tap the map to set the ${which === "pickup" ? "pickup" : "destination"} location.`
+  );
+}
+
+function setMapMarker(which, coords) {
+  const marker = which === "pickup" ? pickupMarker : destinationMarker;
+  if (!map || !marker || !coords) return;
+
+  marker.setLatLng([coords.lat, coords.lng]).addTo(map);
+}
+
+async function setLocationFromCoordinates(coords, which) {
+  if (which === "pickup") {
+    pickupManuallySet = true;
+    pickupLocationRequestId += 1;
+    pickupCoords = coords;
+  } else {
+    destinationCoords = coords;
+  }
+  setMapMarker(which, coords);
+  map.panTo([coords.lat, coords.lng]);
+  updateFareDisplay();
+
+  const input = document.getElementById(which);
+  const fallbackText =
+    `Selected location (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})`;
+  input.value = fallbackText;
+  setMapStatus(`${which === "pickup" ? "Pickup" : "Destination"} selected. Looking up address...`);
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`
+    );
+    if (!response.ok) throw new Error(`Reverse geocoding failed (HTTP ${response.status}).`);
+    const result = await response.json();
+    input.value = result.display_name || fallbackText;
+    setMapStatus(`${which === "pickup" ? "Pickup" : "Destination"} selected on the map.`);
+  } catch (error) {
+    console.error("Could not look up the selected map address.", error);
+    setMapStatus("Location selected; the address lookup failed. Coordinates are saved.");
+  }
+}
+
+async function geocodeText(which) {
+  const input = document.getElementById(which);
+  const value = input.value.trim();
+
+  if (!value) {
+    alert("Please enter a " +
+      (which === "pickup" ? "pickup location." : "destination."));
+    return;
+  }
+
+  if (which === "pickup") {
+    pickupManuallySet = true;
+    pickupLocationRequestId += 1;
+  }
+
+  setMapStatus("Searching for location...");
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(value)}`
+    );
+    if (!response.ok) throw new Error(`Location search failed (HTTP ${response.status}).`);
+    const results = await response.json();
+    if (!results.length) {
+      alert("Location not found. Try a more specific address.");
+      setMapStatus("Location not found. Try a more specific address.");
+      return;
+    }
+
+    const result = results[0];
+    const coords = { lat: Number(result.lat), lng: Number(result.lon) };
+    if (!Number.isFinite(coords.lat) || !Number.isFinite(coords.lng)) {
+      throw new Error("Location service returned invalid coordinates.");
+    }
+    if (which === "pickup") pickupCoords = coords;
+    else destinationCoords = coords;
+    input.value = result.display_name || value;
+    setMapMarker(which, coords);
+    map.setView([coords.lat, coords.lng], 16);
+    updateFareDisplay();
+    setMapStatus(`${which === "pickup" ? "Pickup" : "Destination"} shown on the map.`);
+  } catch (error) {
+    console.error("Could not search for the map location.", error);
+    setMapStatus("Could not search for this location. Check your connection and try again.");
+  }
+}
+
+function searchPickup() {
+  if (document.getElementById("pickup").value.trim()) {
+    geocodeText("pickup");
+  } else if (pickupCoords) {
+    setMapMarker("pickup", pickupCoords);
+    map.setView([pickupCoords.lat, pickupCoords.lng], 16);
+  } else {
+    useMyLocation();
+  }
+}
+
+function searchDestination() {
+  geocodeText("destination");
+}
+
+function clearDestination() {
+  destinationCoords = null;
+  document.getElementById("destination").value = "";
+  if (destinationMarker && map) map.removeLayer(destinationMarker);
+  updateFareDisplay();
+  setMapStatus("Destination cleared. Search or tap the map to select one.");
+}
+
+async function reverseGeocodeCurrentLocation(coords, requestId) {
+  const pickupInput = document.getElementById("pickup");
+  const fallbackText = `Current location (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})`;
+
+  if (requestId !== pickupLocationRequestId) return;
+  setMapMarker("pickup", coords);
+  if (map) map.setView([coords.lat, coords.lng], 16);
+  pickupInput.value = fallbackText;
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.lat}&lon=${coords.lng}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Reverse geocoding failed (HTTP ${response.status}).`);
+    }
+
+    const data = await response.json();
+    if (requestId !== pickupLocationRequestId) return;
+    pickupInput.value = data.display_name || fallbackText;
+    setMapStatus("Pickup set to your current location.");
+  } catch (error) {
+    console.error("Could not look up the current location address.", error);
+    setMapStatus("Current location found. Coordinates used as pickup.");
+  }
+  updateFareDisplay();
+}
+
+function useMyLocation(showErrorAlert = true, onlyIfUnchanged = false) {
+  if (!navigator.geolocation) {
+    setMapStatus("Location is not supported by this browser. Enter your pickup address.");
+    if (showErrorAlert) alert("Location is not supported by this browser.");
+    return;
+  }
+
+  if (!onlyIfUnchanged) pickupManuallySet = false;
+  const requestId = ++pickupLocationRequestId;
+  setMapStatus("Requesting permission to access your location…");
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      if (requestId !== pickupLocationRequestId ||
+          (onlyIfUnchanged && pickupManuallySet)) {
+        return;
+      }
+
+      const coords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+
+      pickupCoords = coords;
+      reverseGeocodeCurrentLocation(coords, requestId);
+    },
+    error => {
+      console.warn("Could not detect the user's current location.", error);
+      setMapStatus(
+        "Could not detect your location. Allow location permission and open the site over HTTPS, or enter your pickup manually."
+      );
+      if (showErrorAlert) {
+        alert("Allow location permission or enter your pickup address.");
+      }
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+  );
+}
+
+function bookRide() {
+  if (isDriverUser()) {
+    alert("Only passengers can create a booking.");
+    return;
+  }
+
+  const pickup = document.getElementById("pickup").value.trim();
+  const destination = document.getElementById("destination").value.trim();
+  const payment = "Cash";
+  const passengerCountInput = document.getElementById("passengerCount");
+  const passengers = Number(passengerCountInput.value);
+
+  if (!activeUser || activeUser.role !== "passenger") {
+    alert("Please log in with a passenger account before booking.");
+    window.location.href = "index.html";
+    return;
+  }
+
+  const enteredPassengerName =
+    document.getElementById("passengerName").value.trim();
+
+  if (!enteredPassengerName) {
+    alert("Please enter the passenger name.");
+    document.getElementById("passengerName").focus();
+    return;
+  }
+
+  if (
+    !passengerCountInput.value ||
+    !Number.isInteger(passengers) ||
+    passengers < 1 ||
+    passengers > 10
+  ) {
+    alert("Please enter a whole number of passengers from 1 to 10.");
+    passengerCountInput.focus();
+    return;
+  }
+
+  if (!pickup || !destination) {
+    alert("Please enter pickup and destination.");
+    return;
+  }
+
+  if (pickup.toLowerCase() === destination.toLowerCase()) {
+    alert("Pickup and destination must be different.");
+    return;
+  }
+
+  if (!pickupCoords || !destinationCoords) {
+    alert("Please pin both pickup and destination on the map before booking.");
+    setMapStatus("Search each location or select it on the map so the driver can see the pins.");
+    return;
+  }
+
+  const fare = updateFareDisplay();
+
+  const booking = {
+    id: "SK" + Date.now().toString().slice(-8),
+    passengerId: activeUser.id,
+    passengerName: enteredPassengerName,
+    pickup,
+    destination,
+    payment,
+    passengers,
+    fare,
+    pickupCoords,
+    destinationCoords,
+    status: WAITING_BOOKING_STATUS,
+    createdAt: Date.now(),
+    driverId: null
+  };
+
+  saveBooking(booking)
+    .then(() => {
+      currentBooking = booking;
+      renderBooking();
+      document.getElementById("confirmation").scrollIntoView({
+        behavior: "smooth"
+      });
+    })
+    .catch(error => {
+      console.error("Could not send booking to the driver.", error);
+      alert("Your booking could not be sent. Check your connection or browser storage settings and try again.");
+    });
+}
+
+function getAutomaticWaitMinutes() {
+  if (!pickupCoords || !destinationCoords) return 10;
+
+  const distanceKm = haversineDistance(pickupCoords, destinationCoords);
+  return Math.min(60, Math.max(5, Math.ceil(5 + distanceKm * 3)));
+}
+
+async function acceptBooking() {
+  if (!isDriverUser()) {
+    alert("Only the logged-in driver can accept this booking.");
+    return;
+  }
+
+  if (!currentBooking || currentBooking.status === "Cancelled") return;
+
+  const driverName = document.getElementById("driverName").value.trim();
+  const waitInput = document.getElementById("driverWaitMinutes");
+  const enteredMinutes = Number(waitInput.value);
+  const waitingMinutes =
+    waitInput.value.trim() &&
+    Number.isFinite(enteredMinutes) &&
+    enteredMinutes >= 1 &&
+    enteredMinutes <= 120
+      ? Math.round(enteredMinutes)
+      : getAutomaticWaitMinutes();
+
+  if (!driverName) {
+    alert("Please enter the driver's name before accepting the booking.");
+    document.getElementById("driverName").focus();
+    return;
+  }
+
+  if (!firebaseServices.configured) {
+    try {
+      const acceptedAt = new Date().toISOString();
+      currentBooking = updateLocalBooking(currentBooking.id, {
+        status: "Accepted",
+        driverName,
+        waitingMinutes,
+        acceptedAt,
+        driverId: activeUser.id
+      }, booking => {
+        if (booking.status !== WAITING_BOOKING_STATUS) {
+          throw new Error("This booking was already accepted or is no longer available.");
+        }
+      });
+      renderBooking();
+    } catch (error) {
+      console.error("Could not accept the local demo booking.", error);
+      alert(error.message.includes("already accepted")
+        ? "Another driver has already accepted this booking."
+        : "Could not accept this booking. Try again.");
+    }
+    return;
+  }
+
+  try {
+    const bookingRef = firebaseServices.db.collection("bookings")
+      .doc(currentBooking.id);
+    const acceptedAt = new Date().toISOString();
+    await firebaseServices.db.runTransaction(async transaction => {
+      const bookingDocument = await transaction.get(bookingRef);
+      if (!bookingDocument.exists ||
+          bookingDocument.data().status !== WAITING_BOOKING_STATUS) {
+        throw new Error("This booking was already accepted or is no longer available.");
+      }
+      transaction.update(bookingRef, {
+        status: "Accepted",
+        driverName,
+        waitingMinutes,
+        acceptedAt,
+        driverId: activeUser.id,
+        updatedAt: Date.now()
+      });
+    });
+    currentBooking.status = "Accepted";
+    currentBooking.driverName = driverName;
+    currentBooking.waitingMinutes = waitingMinutes;
+    currentBooking.acceptedAt = acceptedAt;
+    currentBooking.driverId = activeUser.id;
+    renderBooking();
+  } catch (error) {
+    console.error("Could not accept the shared booking.", error);
+    alert(error.message.includes("already accepted")
+      ? "Another driver has already accepted this booking."
+      : "Could not accept this booking. Check your connection and try again.");
+  }
+}
+
+async function declineBooking() {
+  if (!isDriverUser()) {
+    alert("Only the logged-in driver can decline this booking.");
+    return;
+  }
+
+  if (!currentBooking || currentBooking.status === "Cancelled") return;
+
+  if (!firebaseServices.configured) {
+    try {
+      currentBooking = updateLocalBooking(currentBooking.id, {
+        status: "Declined",
+        declinedAt: new Date().toISOString()
+      }, booking => {
+        if (booking.status !== WAITING_BOOKING_STATUS) {
+          throw new Error("This booking is no longer available.");
+        }
+      });
+      renderBooking();
+    } catch (error) {
+      console.error("Could not decline the local demo booking.", error);
+      alert("Could not decline this booking. Try again.");
+    }
+    return;
+  }
+
+  try {
+    const bookingRef = firebaseServices.db.collection("bookings")
+      .doc(currentBooking.id);
+    const declinedAt = new Date().toISOString();
+    await firebaseServices.db.runTransaction(async transaction => {
+      const bookingDocument = await transaction.get(bookingRef);
+      if (!bookingDocument.exists ||
+          bookingDocument.data().status !== WAITING_BOOKING_STATUS) {
+        throw new Error("This booking is no longer available.");
+      }
+      transaction.update(bookingRef, {
+        status: "Declined",
+        declinedAt,
+        updatedAt: Date.now()
+      });
+    });
+    currentBooking.status = "Declined";
+    currentBooking.declinedAt = declinedAt;
+    renderBooking();
+  } catch (error) {
+    console.error("Could not decline the shared booking.", error);
+    alert("Could not decline this booking. Check your connection and try again.");
+  }
+}
+
+async function saveBooking(booking) {
+  if (!activeUser) {
+    throw new Error("Please log in before creating a booking.");
+  }
+
+  const bookingToSave = {
+    ...booking,
+    updatedAt: Date.now()
+  };
+  if (!firebaseServices.configured) {
+    const bookings = getLocalBookings();
+    bookings.push(bookingToSave);
+    saveLocalBookings(bookings);
+    applyLocalBookings();
+    return;
+  }
+
+  await firebaseServices.db.collection("bookings")
+    .doc(booking.id).set(bookingToSave);
+}
+
+function stopBookingSync() {
+  bookingUnsubscribers.forEach(unsubscribe => unsubscribe());
+  bookingUnsubscribers = [];
+  bookingSnapshots.clear();
+}
+
+function applyBookingSnapshots(sourceName, snapshot) {
+  bookingSnapshots.set(
+    sourceName,
+    snapshot.docs.map(document => ({ ...document.data(), id: document.id }))
+  );
+
+  applyBookings(Array.from(bookingSnapshots.values()).flat());
+}
+
+function applyBookings(allBookings) {
+  const userBookings = isDriverUser()
+    ? allBookings.filter(booking =>
+        booking.status === WAITING_BOOKING_STATUS ||
+        booking.driverId === activeUser.id
+      )
+    : allBookings.filter(booking => booking.passengerId === activeUser.id);
+  const visibleBookings = isDriverUser()
+    ? userBookings.filter(booking =>
+        booking.status === WAITING_BOOKING_STATUS ||
+        (booking.driverId === activeUser.id &&
+          booking.status !== "Cancelled")
+      )
+    : userBookings;
+  const activeDriverRequests = isDriverUser()
+    ? visibleBookings.filter(booking => booking.status === WAITING_BOOKING_STATUS)
+    : [];
+  const latestBooking = visibleBookings
+    .filter(booking =>
+      !isDriverUser() ||
+      activeDriverRequests.length === 0 ||
+      booking.status === WAITING_BOOKING_STATUS
+    )
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+
+  const historyBookings = isDriverUser()
+    ? allBookings.filter(booking => booking.driverId === activeUser.id)
+    : allBookings.filter(booking => booking.passengerId === activeUser.id);
+  const uniqueHistoryBookings = Array.from(
+    new Map(historyBookings.map(booking => [booking.id, booking])).values()
+  );
+  renderRideHistory(uniqueHistoryBookings);
+
+  if (!latestBooking) {
+    currentBooking = null;
+    hideBookingConfirmation();
+    if (isDriverUser()) {
+      setMapStatus("Waiting for passenger bookings. New requests will appear here.");
+    }
+    return;
+  }
+
+  currentBooking = latestBooking;
+  renderBooking();
+}
+
+function subscribeToBookings(query, sourceName) {
+  const unsubscribe = query.onSnapshot(
+    snapshot => applyBookingSnapshots(sourceName, snapshot),
+    error => {
+      console.error(`Could not sync ${sourceName} bookings.`, error);
+      setMapStatus("Live booking updates are unavailable. Check your connection and Firebase rules.");
+    }
+  );
+  bookingUnsubscribers.push(unsubscribe);
+}
+
+function startBookingSync() {
+  stopBookingSync();
+  if (!firebaseServices.configured) {
+    try {
+      applyLocalBookings();
+    } catch (error) {
+      console.error("Could not load local demo bookings.", error);
+      setMapStatus("Could not load local bookings. Check this browser's storage settings.");
+    }
+
+    const onLocalBookingsChanged = event => {
+      if (event.key !== LOCAL_BOOKINGS_KEY && event.key !== null) return;
+      try {
+        applyLocalBookings();
+      } catch (error) {
+        console.error("Could not sync local demo bookings.", error);
+        setMapStatus("Could not sync local bookings. Check this browser's storage settings.");
+      }
+    };
+    window.addEventListener("storage", onLocalBookingsChanged);
+    bookingUnsubscribers.push(() =>
+      window.removeEventListener("storage", onLocalBookingsChanged)
+    );
+    return;
+  }
+
+  const bookings = firebaseServices.db.collection("bookings");
+
+  if (isDriverUser()) {
+    subscribeToBookings(
+      bookings.where("status", "==", WAITING_BOOKING_STATUS),
+      "waiting"
+    );
+    subscribeToBookings(
+      bookings.where("driverId", "==", activeUser.id),
+      "assigned"
+    );
+  } else {
+    subscribeToBookings(
+      bookings.where("passengerId", "==", activeUser.id),
+      "passenger"
+    );
+  }
+}
+
+function showBookingOnMap() {
+  if (!isDriverUser() || !map || !currentBooking) return;
+
+  const pickup = currentBooking.pickupCoords;
+  const destination = currentBooking.destinationCoords;
+
+  if (pickup) setMapMarker("pickup", pickup);
+  else map.removeLayer(pickupMarker);
+  if (destination) setMapMarker("destination", destination);
+  else map.removeLayer(destinationMarker);
+
+  if (pickup && destination) {
+    map.fitBounds([
+      [pickup.lat, pickup.lng],
+      [destination.lat, destination.lng]
+    ], { padding: [30, 30] });
+    setMapStatus("Live booking map: P is pickup and D is passenger destination.");
+  } else if (pickup || destination) {
+    const location = pickup || destination;
+    map.setView([location.lat, location.lng], 15);
+    setMapStatus("Booking received. Map shows available location coordinates.");
+  } else {
+    setMapStatus("Booking received. Map coordinates were not provided.");
+  }
+}
+
+function updateWaitingTime() {
+  const waitingTime = document.getElementById("waitingTime");
+
+  if (!waitingTime || !currentBooking || currentBooking.status !== "Accepted") {
+    if (waitingTime) waitingTime.style.display = "none";
+    if (waitingTimer) {
+      clearInterval(waitingTimer);
+      waitingTimer = null;
+    }
+    return;
+  }
+
+  const acceptedAt = new Date(currentBooking.acceptedAt).getTime();
+  const waitMilliseconds = currentBooking.waitingMinutes * 60 * 1000;
+  const remainingMilliseconds = Math.max(
+    0,
+    acceptedAt + waitMilliseconds - Date.now()
+  );
+  const remainingMinutes = Math.ceil(remainingMilliseconds / 60000);
+
+  waitingTime.style.display = "block";
+  waitingTime.textContent = remainingMilliseconds > 0
+    ? `Estimated waiting time: ${remainingMinutes} minute${remainingMinutes === 1 ? "" : "s"}`
+    : "The driver should arrive soon.";
+
+  if (remainingMilliseconds === 0 && waitingTimer) {
+    clearInterval(waitingTimer);
+    waitingTimer = null;
+  }
+}
+
+function renderBooking() {
+  if (!currentBooking) return;
+
+  currentBooking.payment = "Cash";
+  if (currentBooking.pickupCoords) pickupCoords = currentBooking.pickupCoords;
+  if (currentBooking.destinationCoords) destinationCoords = currentBooking.destinationCoords;
+  document.getElementById("pickup").value = currentBooking.pickup || "";
+  document.getElementById("destination").value = currentBooking.destination || "";
+  const passengerCount = Number(currentBooking.passengers) || 1;
+  document.getElementById("passengerCount").value = String(passengerCount);
+  selectedPassengerCount = passengerCount;
+  document.getElementById("selectedPassengerText").textContent =
+    `Selected: ${passengerCount} passenger${passengerCount > 1 ? "s" : ""}`;
+  document.getElementById("booking-information").style.display =
+    isDriverUser() ? "block" : "none";
+  document.getElementById("bookingId").textContent = currentBooking.id;
+  document.getElementById("showPassengerName").textContent =
+    currentBooking.passengerName || "Not provided";
+  document.getElementById("showPassengers").textContent = currentBooking.passengers + " passenger(s)";
+  document.getElementById("showPickup").textContent = currentBooking.pickup;
+  document.getElementById("showDestination").textContent = currentBooking.destination;
+  document.getElementById("showPayment").textContent = currentBooking.payment;
+  document.getElementById("showDriverName").textContent =
+    currentBooking.driverName || "Not assigned yet";
+  document.getElementById("estimatedFare").textContent = `₱${currentBooking.fare.toFixed(2)}`;
+  document.getElementById("showStatus").textContent =
+    currentBooking.status === "Completed"
+      ? "Completed successfully"
+      : currentBooking.status;
+  document.getElementById("completedMessage").style.display =
+    currentBooking.status === "Completed" ? "inline-block" : "none";
+  document.getElementById("driverBookingPassenger").textContent =
+    currentBooking.passengerName || "Not provided";
+  document.getElementById("driverBookingPickup").textContent = currentBooking.pickup;
+  document.getElementById("driverBookingDestination").textContent = currentBooking.destination;
+  document.getElementById("driverBookingPassengers").textContent =
+    currentBooking.passengers + " passenger(s)";
+  document.getElementById("driverBookingPayment").textContent = currentBooking.payment;
+  document.getElementById("driverBookingFare").textContent =
+    `₱${currentBooking.fare.toFixed(2)}`;
+  document.getElementById("driverBookingStatus").textContent =
+    currentBooking.status === "Completed"
+      ? "Completed successfully"
+      : currentBooking.status;
+  showBookingOnMap();
+  document.getElementById("driverAcceptance").style.display =
+    isDriverUser() && currentBooking.status === "Waiting for driver confirmation"
+      ? "block"
+      : "none";
+  document.getElementById("completeRideButton").style.display =
+    isDriverUser() &&
+    currentBooking.status === "Accepted" &&
+    currentBooking.driverId === activeUser.id
+      ? "block"
+      : "none";
+  document.getElementById("cancelBookingButton").style.display =
+    !isDriverUser() &&
+    [WAITING_BOOKING_STATUS, "Accepted"].includes(currentBooking.status)
+      ? "block"
+      : "none";
+  updateRideChat();
+
+  document.getElementById("confirmation").style.display =
+    currentBooking.status === "Cancelled" ? "none" : "block";
+
+  updateWaitingTime();
+  if (currentBooking.status === "Accepted" && !waitingTimer) {
+    waitingTimer = setInterval(updateWaitingTime, 1000);
+  }
+
+}
+
+function stopRideChat() {
+  if (chatUnsubscribe) {
+    chatUnsubscribe();
+    chatUnsubscribe = null;
+  }
+  chatBookingId = null;
+}
+
+function updateRideChat() {
+  const chatSection = document.getElementById("rideChatSection");
+  const canChat = currentBooking &&
+    ["Accepted", "Completed"].includes(currentBooking.status) &&
+    currentBooking.driverId &&
+    (activeUser.id === currentBooking.passengerId ||
+      activeUser.id === currentBooking.driverId);
+
+  if (!canChat) {
+    stopRideChat();
+    chatSection.classList.add("hidden");
+    document.getElementById("chatMessages").replaceChildren();
+    const emptyMessage = document.createElement("p");
+    emptyMessage.id = "chatEmpty";
+    emptyMessage.className = "chat-empty";
+    emptyMessage.textContent = "Chat becomes available after the driver accepts the ride.";
+    document.getElementById("chatMessages").append(emptyMessage);
+    document.getElementById("chatInput").disabled = true;
+    document.getElementById("chatSendButton").disabled = true;
+    return;
+  }
+
+  document.getElementById("chatPartnerName").textContent = isDriverUser()
+    ? currentBooking.passengerName || "Passenger"
+    : currentBooking.driverName || "Driver";
+  document.getElementById("chatPartnerRole").textContent =
+    isDriverUser() ? "Passenger" : "Driver";
+  chatSection.classList.remove("hidden");
+  document.getElementById("chatInput").disabled = false;
+  document.getElementById("chatSendButton").disabled = false;
+  if (!firebaseServices.configured) {
+    if (chatBookingId !== currentBooking.id) {
+      stopRideChat();
+      chatBookingId = currentBooking.id;
+    }
+    renderChatMessages(currentBooking.chatMessages || []);
+    return;
+  }
+
+  if (chatBookingId === currentBooking.id) return;
+
+  stopRideChat();
+  chatBookingId = currentBooking.id;
+  document.getElementById("chatStatus").textContent = "";
+  const messages = document.getElementById("chatMessages");
+  messages.replaceChildren();
+  const loadingMessage = document.createElement("p");
+  loadingMessage.className = "chat-empty";
+  loadingMessage.textContent = "Loading messages…";
+  messages.append(loadingMessage);
+
+  chatUnsubscribe = firebaseServices.db.collection("bookings")
+    .doc(currentBooking.id).collection("messages")
+    .orderBy("createdAt", "desc")
+    .limit(100)
+    .onSnapshot(snapshot => {
+      renderChatMessages(snapshot.docs.map(document => ({
+          ...document.data(),
+          id: document.id
+        })).reverse());
+    }, error => {
+      console.error("Could not load ride chat messages.", error);
+      document.getElementById("chatStatus").textContent =
+        "Chat is unavailable. Check your connection and Firebase rules.";
+    });
+}
+
+function renderChatMessages(messages) {
+  const list = document.getElementById("chatMessages");
+  list.replaceChildren();
+
+  if (!messages.length) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "chat-empty";
+    emptyMessage.textContent = "No messages yet. Send the first message.";
+    list.append(emptyMessage);
+    return;
+  }
+
+  messages.forEach(message => {
+    const item = document.createElement("article");
+    item.className = "chat-message" +
+      (message.senderId === activeUser.id ? " own" : "");
+
+    const sender = document.createElement("strong");
+    sender.textContent = message.senderId === activeUser.id
+      ? "You"
+      : message.senderName || "Ride participant";
+
+    const text = document.createElement("p");
+    text.textContent = message.text;
+
+    const time = document.createElement("time");
+    const sentAt = Number(message.createdAt);
+    time.dateTime = Number.isFinite(sentAt)
+      ? new Date(sentAt).toISOString()
+      : "";
+    time.textContent = Number.isFinite(sentAt)
+      ? new Date(sentAt).toLocaleTimeString()
+      : "";
+
+    item.append(sender, text, time);
+    list.append(item);
+  });
+
+  list.scrollTop = list.scrollHeight;
+}
+
+async function sendChatMessage(event) {
+  event.preventDefault();
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  const status = document.getElementById("chatStatus");
+
+  if (!text || !currentBooking || chatBookingId !== currentBooking.id) return;
+  if (text.length > 1000) {
+    status.textContent = "Messages must be 1,000 characters or fewer.";
+    return;
+  }
+
+  const sendButton = document.getElementById("chatSendButton");
+  sendButton.disabled = true;
+  status.textContent = "Sending…";
+
+  try {
+    if (!firebaseServices.configured) {
+      const message = {
+        id: `${Date.now()}-${activeUser.id}`,
+        senderId: activeUser.id,
+        senderName: activeUser.name,
+        text,
+        createdAt: Date.now()
+      };
+      currentBooking = updateLocalBooking(currentBooking.id, {
+        chatMessages: [...(currentBooking.chatMessages || []), message]
+      }, booking => {
+        if (!["Accepted", "Completed"].includes(booking.status) ||
+            (booking.passengerId !== activeUser.id &&
+             booking.driverId !== activeUser.id)) {
+          throw new Error("Chat is not available for this booking.");
+        }
+      });
+      renderChatMessages(currentBooking.chatMessages);
+      input.value = "";
+      status.textContent = "";
+      return;
+    }
+
+    await firebaseServices.db.collection("bookings")
+      .doc(currentBooking.id).collection("messages").add({
+        senderId: activeUser.id,
+        senderName: activeUser.name,
+        text,
+        createdAt: Date.now()
+      });
+    input.value = "";
+    status.textContent = "";
+  } catch (error) {
+    console.error("Could not send ride chat message.", error);
+    status.textContent = "Message could not be sent. Check your connection or browser storage settings and try again.";
+  } finally {
+    sendButton.disabled = false;
+  }
+}
+
+function formatBookingStatus(booking) {
+  if (booking.status === "Completed") return "Completed successfully";
+  return booking.status || "Status unavailable";
+}
+
+function renderRideHistory(bookings) {
+  const historyList = document.getElementById("rideHistoryList");
+  const emptyMessage = document.getElementById("rideHistoryEmpty");
+  const sortedBookings = [...bookings].sort(
+    (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
+  );
+  const completedTrips = sortedBookings.filter(
+    booking => booking.status === "Completed"
+  ).length;
+
+  if (isDriverUser()) {
+    document.getElementById("driverTripCount").textContent =
+      String(completedTrips);
+  }
+
+  historyList.replaceChildren();
+  emptyMessage.style.display = sortedBookings.length ? "none" : "block";
+  emptyMessage.textContent = isDriverUser()
+    ? "No bookings yet. New passenger requests will appear here."
+    : "You have no rides in your history yet.";
+
+  sortedBookings.forEach(booking => {
+    const item = document.createElement("article");
+    item.className = "history-item";
+
+    const title = document.createElement("p");
+    const titleText = document.createElement("strong");
+    titleText.textContent = isDriverUser()
+      ? `Passenger: ${booking.passengerName || "Not provided"}`
+      : `Ride ${booking.id || ""}`;
+    title.append(titleText);
+
+    const route = document.createElement("p");
+    route.textContent = `${booking.pickup || "Pickup unavailable"} → ${booking.destination || "Destination unavailable"}`;
+
+    const detail = document.createElement("p");
+    const date = booking.createdAt
+      ? new Date(booking.createdAt).toLocaleString()
+      : "Date unavailable";
+    const fare = Number.isFinite(Number(booking.fare))
+      ? `₱${Number(booking.fare).toFixed(2)}`
+      : "Fare unavailable";
+    detail.textContent = isDriverUser()
+      ? `${date} • ${booking.passengers || 1} passenger(s) • ${fare}`
+      : `${date} • ${booking.passengers || 1} passenger(s) • ${fare} • Driver: ${booking.driverName || "Not assigned"}`;
+
+    const status = document.createElement("span");
+    status.className = "history-status";
+    status.textContent = formatBookingStatus(booking);
+
+    item.append(title, route, detail, status);
+    historyList.append(item);
+  });
+}
+
+async function completeRide() {
+  if (!isDriverUser() || !currentBooking ||
+      currentBooking.status !== "Accepted" ||
+      currentBooking.driverId !== activeUser.id) {
+    alert("Only the assigned driver can mark this ride as delivered.");
+    return;
+  }
+
+  const completedAt = new Date().toISOString();
+  if (!firebaseServices.configured) {
+    try {
+      currentBooking = updateLocalBooking(currentBooking.id, {
+        status: "Completed",
+        completedAt
+      }, booking => {
+        if (booking.driverId !== activeUser.id ||
+            booking.status !== "Accepted") {
+          throw new Error("This ride is no longer active for this driver.");
+        }
+      });
+      renderBooking();
+      return;
+    } catch (error) {
+      console.error("Could not complete the local demo ride.", error);
+      alert("Could not mark this ride as delivered. Try again.");
+      return;
+    }
+  }
+
+  const bookingRef = firebaseServices.db.collection("bookings")
+    .doc(currentBooking.id);
+
+  try {
+    await firebaseServices.db.runTransaction(async transaction => {
+      const bookingDocument = await transaction.get(bookingRef);
+      if (!bookingDocument.exists ||
+          bookingDocument.data().driverId !== activeUser.id ||
+          bookingDocument.data().status !== "Accepted") {
+        throw new Error("This ride is no longer active for this driver.");
+      }
+
+      transaction.update(bookingRef, {
+        status: "Completed",
+        completedAt,
+        updatedAt: Date.now()
+      });
+    });
+
+    currentBooking.status = "Completed";
+    currentBooking.completedAt = completedAt;
+    renderBooking();
+    const updatedHistory = Array.from(bookingSnapshots.values())
+      .flat()
+      .filter(booking =>
+        booking.driverId === activeUser.id &&
+        booking.id !== currentBooking.id
+      );
+    updatedHistory.push(currentBooking);
+    renderRideHistory(updatedHistory);
+  } catch (error) {
+    console.error("Could not complete the ride.", error);
+    alert("Could not mark this ride as delivered. Check your connection and try again.");
+  }
+}
+
+async function cancelRide() {
+  if (isDriverUser()) {
+    alert("Drivers can accept or decline bookings. Only passengers can cancel a booking.");
+    return;
+  }
+
+  if (!currentBooking ||
+      ![WAITING_BOOKING_STATUS, "Accepted"].includes(currentBooking.status)) {
+    alert("Only an active booking can be cancelled.");
+    return;
+  }
+
+  try {
+    if (!firebaseServices.configured) {
+      currentBooking = updateLocalBooking(currentBooking.id, {
+        status: "Cancelled"
+      }, booking => {
+        if (booking.passengerId !== activeUser.id ||
+            ![WAITING_BOOKING_STATUS, "Accepted"].includes(booking.status)) {
+          throw new Error("This booking can no longer be cancelled.");
+        }
+      });
+      renderBooking();
+      alert("Your booking has been cancelled.");
+      return;
+    }
+
+    const bookingRef = firebaseServices.db.collection("bookings")
+      .doc(currentBooking.id);
+    await firebaseServices.db.runTransaction(async transaction => {
+      const bookingDocument = await transaction.get(bookingRef);
+      if (!bookingDocument.exists ||
+          bookingDocument.data().passengerId !== activeUser.id ||
+          ![WAITING_BOOKING_STATUS, "Accepted"].includes(bookingDocument.data().status)) {
+        throw new Error("This booking can no longer be cancelled.");
+      }
+      transaction.update(bookingRef, {
+        status: "Cancelled",
+        updatedAt: Date.now()
+      });
+    });
+    currentBooking.status = "Cancelled";
+    renderBooking();
+    alert("Your booking has been cancelled.");
+  } catch (error) {
+    console.error("Could not cancel the shared booking.", error);
+    alert("Could not cancel this booking. Check your connection and try again.");
+  }
+}
+
+function goHome() {
+  const previousSection = document.getElementById(previousSectionId);
+
+  if (!previousSection) return;
+
+  previousSection.style.display = "block";
+  previousSection.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function showActivity() {
+  if (!isDriverUser()) return;
+
+  previousSectionId = "map-location";
+  document.getElementById("booking-information").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+function showPaymentOptions() {
+  previousSectionId = "booking-information";
+  document.getElementById("payment-options").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+function showLogoutDialog() {
+  document.getElementById("logoutDialog").style.display = "flex";
+}
+
+function closeLogoutDialog() {
+  document.getElementById("logoutDialog").style.display = "none";
+}
+
+async function confirmLogout() {
+  try {
+    if (firebaseServices.configured) {
+      await firebaseServices.auth.signOut();
+    } else {
+      sessionStorage.removeItem(LOCAL_SESSION_KEY);
+    }
+  } catch (error) {
+    console.error("Could not sign out.", error);
+    alert("Could not sign out. Please try again.");
+    return;
+  }
+
+  closeLogoutDialog();
+  window.location.href = "index.html";
+}
+
+function hideBookingConfirmation() {
+  currentBooking = null;
+  stopRideChat();
+  document.getElementById("confirmation").style.display = "none";
+  document.getElementById("booking-information").style.display = "none";
+  document.getElementById("rideChatSection").classList.add("hidden");
+  if (isDriverUser() && map) {
+    map.removeLayer(pickupMarker);
+    map.removeLayer(destinationMarker);
+  }
+}
+
+function initializeBookingPage() {
+  applyUserRole();
+
+  try {
+    initMap();
+  } catch (error) {
+    console.error("Could not load the embedded map.", error);
+    setMapStatus("The map could not load. Check your internet connection and reload.");
+  }
+  startBookingSync();
+  updateFareDisplay();
+  if (activeUser.role === "passenger" && map && !currentBooking) {
+    useMyLocation(false, true);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const pickupInput = document.getElementById("pickup");
+  const destinationInput = document.getElementById("destination");
+  document.getElementById("chatForm")
+    .addEventListener("submit", sendChatMessage);
+
+  pickupInput.addEventListener("input", () => {
+    pickupManuallySet = true;
+    pickupLocationRequestId += 1;
+    pickupCoords = null;
+    if (pickupMarker && map) map.removeLayer(pickupMarker);
+    updateFareDisplay();
+  });
+  destinationInput.addEventListener("input", () => {
+    destinationCoords = null;
+    if (destinationMarker && map) map.removeLayer(destinationMarker);
+    updateFareDisplay();
+  });
+
+  if (!firebaseServices.configured) {
+    try {
+      const session = JSON.parse(
+        sessionStorage.getItem(LOCAL_SESSION_KEY) || "null"
+      );
+      const account = session && getLocalAccounts().find(savedAccount =>
+        savedAccount.id === session.id &&
+        savedAccount.email === session.email &&
+        savedAccount.role === session.role
+      );
+      if (!account) {
+        window.location.replace("index.html");
+        return;
+      }
+
+      activeUser = {
+        id: account.id,
+        email: account.email,
+        name: account.name,
+        role: account.role,
+        plateNumber: account.plateNumber || ""
+      };
+      initializeBookingPage();
+    } catch (error) {
+      console.error("Could not load the local demo account.", error);
+      alert("Could not load your local account. Check this browser's storage settings and log in again.");
+      window.location.replace("index.html");
+    }
+    return;
+  }
+
+  firebaseServices.auth.onAuthStateChanged(async authenticatedUser => {
+    if (!authenticatedUser) {
+      window.location.replace("index.html");
+      return;
+    }
+
+    try {
+      const profileDocument = await firebaseServices.db.collection("users")
+        .doc(authenticatedUser.uid).get();
+      if (!profileDocument.exists) {
+        throw new Error("The Firebase account profile is missing.");
+      }
+
+      const profile = profileDocument.data();
+      activeUser = {
+        id: authenticatedUser.uid,
+        email: authenticatedUser.email,
+        name: profile.name,
+        role: profile.role,
+        plateNumber: profile.plateNumber || ""
+      };
+      initializeBookingPage();
+    } catch (error) {
+      console.error("Could not load the signed-in Firebase profile.", error);
+      alert("Could not load your account. Please log in again.");
+      await firebaseServices.auth.signOut();
+      window.location.replace("index.html");
+    }
+  });
+});
+
+window.addEventListener("beforeunload", () => {
+  stopBookingSync();
+  stopRideChat();
+});
+</script>
+
+</body>
+</html>

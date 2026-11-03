@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAKAY KITA | Login System</title>
+
+<style>
+* {
+box-sizing: border-box;
+font-family: Arial, sans-serif;
+}
+
+body {
+margin: 0;
+min-height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+background: #eaf5ed;
+padding: 20px;
+}
+
+.container {
+width: 100%;
+max-width: 420px;
+background: white;
+padding: 28px;
+border-radius: 18px;
+box-shadow: 0 6px 25px #00000015;
+}
+
+.logo {
+text-align: center;
+color: #087c45;
+font-size: 29px;
+font-weight: bold;
+margin-bottom: 8px;
+}
+
+.subtitle {
+text-align: center;
+color: #66756b;
+margin-bottom: 25px;
+}
+
+h2 {
+color: #087c45;
+margin-top: 0;
+}
+
+label {
+display: block;
+margin: 14px 0 6px;
+font-weight: bold;
+font-size: 14px;
+}
+
+input, select {
+width: 100%;
+padding: 12px;
+border: 1px solid #ccd9cf;
+border-radius: 8px;
+font-size: 15px;
+background: white;
+}
+
+.password-input {
+display: flex;
+gap: 8px;
+}
+
+.password-input input {
+flex: 1;
+min-width: 0;
+}
+
+button {
+width: 100%;
+padding: 13px;
+margin-top: 16px;
+border: none;
+border-radius: 8px;
+background: #087c45;
+color: white;
+font-size: 16px;
+font-weight: bold;
+cursor: pointer;
+}
+
+button:hover {
+background: #056337;
+}
+
+.password-toggle {
+width: auto;
+flex-shrink: 0;
+margin-top: 0;
+padding: 0 12px;
+background: #e6f4eb;
+color: #087c45;
+font-size: 14px;
+}
+
+.password-toggle:hover {
+background: #d3ebdc;
+}
+
+.continue-btn {
+display: block;
+width: 100%;
+margin-top: 18px;
+margin-bottom: 10px;
+text-align: center;
+text-decoration: none;
+}
+
+.switch {
+text-align: center;
+margin-top: 18px;
+font-size: 14px;
+}
+
+.switch a {
+color: #087c45;
+font-weight: bold;
+cursor: pointer;
+}
+
+.message {
+margin-top: 12px;
+font-size: 14px;
+line-height: 1.5;
+}
+
+.hidden {
+display: none !important;
+}
+
+.dashboard {
+text-align: center;
+}
+
+.role {
+display: inline-block;
+background: #e5f5e9;
+color: #087c45;
+border-radius: 20px;
+padding: 7px 12px;
+font-weight: bold;
+font-size: 13px;
+margin: 10px 0;
+}
+
+.note {
+color: #6b776e;
+font-size: 12px;
+line-height: 1.5;
+margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo"> SAKAY KITA</div>
+<p class="subtitle">Safe Rides. Faster Trips. Together.</p>
+
+<!-- LOGIN FORM -->
+<section id="loginSection">
+<h2>Log In</h2>
+
+<form id="loginForm">
+<label for="loginEmail">Email Address</label>
+<input
+id="loginEmail"
+type="email"
+placeholder="Enter your email"
+autocomplete="username"
+required
+>
+
+<label for="loginPassword">Password</label>
+<div class="password-input">
+<input
+id="loginPassword"
+type="password"
+placeholder="Enter your password"
+autocomplete="current-password"
+required
+>
+<button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePasswordVisibility('loginPassword', this)">Show</button>
+</div>
+
+<label for="loginRole">Log in as</label>
+<select id="loginRole" required>
+<option value="passenger">Student / Passenger</option>
+<option value="driver">Driver</option>
+</select>
+
+<button type="submit">Log In</button>
+<p id="loginMessage" class="message" aria-live="polite"></p>
+</form>
+
+<p id="passwordResetLink" class="switch">
+Forgot your password?
+<a onclick="sendPasswordReset()">Email me a password reset link</a>
+</p>
+
+<p class="switch">
+Don't have an account?
+<a onclick="showRegister()">Create Account</a>
+</p>
+</section>
+
+<!-- REGISTRATION FORM -->
+<section id="registerSection" class="hidden">
+<h2>Create Account</h2>
+
+<form id="registerForm">
+<label for="fullName">Full Name</label>
+<input
+id="fullName"
+type="text"
+placeholder="Enter your full name"
+autocomplete="name"
+required
+>
+
+<label for="registerEmail">Email Address</label>
+<input
+id="registerEmail"
+type="email"
+placeholder="Enter your email"
+autocomplete="email"
+required
+>
+
+<label for="registerPassword">Password</label>
+<div class="password-input">
+<input
+id="registerPassword"
+type="password"
+placeholder="At least 8 characters"
+minlength="8"
+autocomplete="new-password"
+required
+>
+<button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePasswordVisibility('registerPassword', this)">Show</button>
+</div>
+
+<label for="registerRole">Account Type</label>
+<select id="registerRole" onchange="toggleDriverFields()" required>
+<option value="passenger">Student / Passenger</option>
+<option value="driver">Driver</option>
+</select>
+
+<div id="driverFields" class="hidden">
+<label for="plateNumber">Tricycle Plate Number</label>
+<input
+id="plateNumber"
+type="text"
+placeholder="Enter tricycle plate number"
+autocomplete="off"
+>
+</div>
+
+<button type="submit">Register</button>
+<p id="registerMessage" class="message" aria-live="polite"></p>
+</form>
+
+<p class="switch">
+Already have an account?
+<a onclick="showLogin()">Log In</a>
+</p>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboardSection" class="dashboard hidden">
+<h2>Welcome to SAKAY KITA!</h2>
+<p id="welcomeName"></p>
+<div id="welcomeRole" class="role"></div>
+<p id="dashboardDetails"></p>
+<p id="emailNotificationMessage" class="message" aria-live="polite"></p>
+
+
+<button id="continueButton" class="continue-btn" type="button" onclick="continueToBooking()">
+Continue to Ride Booking
+</button>
+
+<button id="showChangePasswordButton" class="hidden" type="button" onclick="showChangePasswordForm()">
+Change Password
+</button>
+
+<section id="changePasswordSection" class="hidden">
+<h2>Change Password</h2>
+<p>We will email a secure password reset link to <strong id="passwordResetEmail"></strong>.</p>
+<button id="sendDashboardResetButton" type="button" onclick="sendDashboardPasswordReset()">
+Send Password Reset Link
+</button>
+<button type="button" class="continue-btn" onclick="hideChangePasswordForm()">Cancel</button>
+<p id="changePasswordMessage" class="message" aria-live="polite"></p>
+</section>
+
+<button type="button" onclick="logout()">Log Out</button>
+
+<p class="note">
+Driver accounts are intended for drivers operating tricycles.
+Local demo accounts are saved only in this browser.
+</p>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const LEGACY_USERS_KEY = "sakayKitaDemoUsers";
+const LOCAL_ACCOUNTS_KEY = "sakayKitaLocalAccounts";
+const LOCAL_SESSION_KEY = "sakayKitaLocalSession";
+const LOCAL_PASSWORD_ITERATIONS = 120000;
+const firebaseServices = window.sakayKitaFirebase;
+const EMAILJS_CONFIG = {
+serviceId: "",
+templateId: "",
+publicKey: ""
+};
+let currentUser = null;
+
+document.getElementById("passwordResetLink").classList.toggle(
+"hidden",
+!firebaseServices.configured
+);
+
+function getLocalAccounts() {
+const accounts = JSON.parse(localStorage.getItem(LOCAL_ACCOUNTS_KEY) || "[]");
+if (!Array.isArray(accounts)) {
+throw new Error("The saved local accounts are invalid.");
+}
+return accounts;
+}
+
+function getWebCrypto() {
+if (!window.crypto || !window.crypto.subtle) {
+throw new Error(
+"Local demo accounts require a secure browser context, such as HTTPS or localhost."
+);
+}
+return window.crypto;
+}
+
+function bytesToBase64(bytes) {
+return btoa(String.fromCharCode(...bytes));
+}
+
+async function hashLocalPassword(password, salt) {
+const crypto = getWebCrypto();
+const passwordKey = await crypto.subtle.importKey(
+"raw",
+new TextEncoder().encode(password),
+"PBKDF2",
+false,
+["deriveBits"]
+);
+const passwordHash = await crypto.subtle.deriveBits(
+{
+name: "PBKDF2",
+salt,
+iterations: LOCAL_PASSWORD_ITERATIONS,
+hash: "SHA-256"
+},
+passwordKey,
+256
+);
+return new Uint8Array(passwordHash);
+}
+
+function saveLocalAccount(account) {
+const accounts = getLocalAccounts();
+if (accounts.some(savedAccount => savedAccount.email === account.email)) {
+throw new Error("This email is already registered. Please log in.");
+}
+accounts.push(account);
+localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function saveLocalSession(account) {
+sessionStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify({
+id: account.id,
+name: account.name,
+email: account.email,
+role: account.role,
+plateNumber: account.plateNumber || ""
+}));
+}
+
+function showLocalError(message, error, context) {
+console.error(context, error);
+message.style.color = "#b42318";
+message.textContent = error.message ||
+"Could not access local demo accounts. Check your browser storage settings and try again.";
+}
+
+function findLegacyUser(email, password, role) {
+try {
+const legacyUsers = JSON.parse(localStorage.getItem(LEGACY_USERS_KEY) || "[]");
+return legacyUsers.find(user =>
+user.email === email &&
+user.password === password &&
+user.role === role
+) || null;
+} catch (error) {
+console.error("Could not read the previous local account.", error);
+return null;
+}
+}
+
+async function migrateLegacyUser(legacyUser, authenticatedUser) {
+const isNewCloudAccount = !authenticatedUser;
+const user = authenticatedUser || (await firebaseServices.auth
+.createUserWithEmailAndPassword(legacyUser.email, legacyUser.password)).user;
+const migratedUser = {
+id: user.uid,
+name: legacyUser.name,
+email: legacyUser.email,
+role: legacyUser.role,
+plateNumber: legacyUser.plateNumber || ""
+};
+
+try {
+await firebaseServices.db.collection("users")
+.doc(migratedUser.id).set({
+name: migratedUser.name,
+email: migratedUser.email,
+role: migratedUser.role,
+plateNumber: migratedUser.plateNumber
+});
+} catch (error) {
+if (isNewCloudAccount) {
+try {
+await user.delete();
+} catch (deleteError) {
+console.error("Could not remove the incomplete migrated account.", deleteError);
+}
+}
+throw error;
+}
+
+try {
+const remainingUsers = JSON.parse(
+localStorage.getItem(LEGACY_USERS_KEY) || "[]"
+).filter(user => user.email !== legacyUser.email);
+localStorage.setItem(LEGACY_USERS_KEY, JSON.stringify(remainingUsers));
+} catch (error) {
+console.error("Could not remove the migrated local account.", error);
+}
+return migratedUser;
+}
+
+function showLogin() {
+document.getElementById("loginSection").classList.remove("hidden");
+document.getElementById("registerSection").classList.add("hidden");
+document.getElementById("dashboardSection").classList.add("hidden");
+clearMessages();
+}
+
+function showRegister() {
+document.getElementById("loginSection").classList.add("hidden");
+document.getElementById("registerSection").classList.remove("hidden");
+document.getElementById("dashboardSection").classList.add("hidden");
+clearMessages();
+toggleDriverFields();
+}
+
+function clearMessages() {
+document.getElementById("loginMessage").textContent = "";
+document.getElementById("registerMessage").textContent = "";
+document.getElementById("changePasswordMessage").textContent = "";
+}
+
+function togglePasswordVisibility(inputId, button) {
+const passwordInput = document.getElementById(inputId);
+const shouldShow = passwordInput.type === "password";
+
+passwordInput.type = shouldShow ? "text" : "password";
+button.textContent = shouldShow ? "Hide" : "Show";
+button.setAttribute("aria-label", shouldShow ? "Hide password" : "Show password");
+button.setAttribute("aria-pressed", String(shouldShow));
+}
+
+function toggleDriverFields() {
+const isDriver =
+document.getElementById("registerRole").value === "driver";
+
+document.getElementById("driverFields")
+.classList.toggle("hidden", !isDriver);
+
+document.getElementById("plateNumber").required = isDriver;
+}
+
+document.getElementById("registerForm")
+.addEventListener("submit", async function(event) {
+event.preventDefault();
+
+const name = document.getElementById("fullName").value.trim();
+const email = document.getElementById("registerEmail")
+.value.trim().toLowerCase();
+const password = document.getElementById("registerPassword").value;
+const role = document.getElementById("registerRole").value;
+const plateNumber = document.getElementById("plateNumber")
+.value.trim().toUpperCase();
+
+const message = document.getElementById("registerMessage");
+
+if (password.length < 8) {
+message.style.color = "#b42318";
+message.textContent = "Password must be at least 8 characters.";
+return;
+}
+
+if (role === "driver" && !plateNumber) {
+message.style.color = "#b42318";
+message.textContent = "Please enter your tricycle plate number.";
+return;
+}
+
+if (!firebaseServices.configured) {
+try {
+const crypto = getWebCrypto();
+const salt = crypto.getRandomValues(new Uint8Array(16));
+const passwordHash = await hashLocalPassword(password, salt);
+const accountId = "local-" + bytesToBase64(crypto.getRandomValues(new Uint8Array(16)));
+const localAccount = {
+id: accountId,
+name,
+email,
+role,
+plateNumber: role === "driver" ? plateNumber : "",
+passwordSalt: bytesToBase64(salt),
+passwordHash: bytesToBase64(passwordHash)
+};
+
+const legacyAccounts = JSON.parse(
+localStorage.getItem(LEGACY_USERS_KEY) || "[]"
+);
+if (legacyAccounts.some(account => account.email === email)) {
+throw new Error("This email is already registered. Please log in.");
+}
+saveLocalAccount(localAccount);
+currentUser = {
+id: localAccount.id,
+name: localAccount.name,
+email: localAccount.email,
+role: localAccount.role,
+plateNumber: localAccount.plateNumber
+};
+saveLocalSession(localAccount);
+showDashboard();
+return;
+} catch (error) {
+showLocalError(message, error, "Could not create the local demo account:");
+return;
+}
+}
+
+let createdCloudUser = null;
+
+try {
+const credential = await firebaseServices.auth
+.createUserWithEmailAndPassword(email, password);
+const cloudUser = credential.user;
+createdCloudUser = cloudUser;
+const user = {
+id: cloudUser.uid,
+name,
+email,
+role,
+plateNumber: role === "driver" ? plateNumber : ""
+};
+
+await firebaseServices.db.collection("users")
+.doc(user.id).set({
+name: user.name,
+email: user.email,
+role: user.role,
+plateNumber: user.plateNumber
+});
+
+currentUser = user;
+message.style.color = "#087c45";
+message.textContent = "Account created successfully!";
+setTimeout(showDashboard, 300);
+} catch (error) {
+if (createdCloudUser) {
+try {
+await createdCloudUser.delete();
+} catch (deleteError) {
+console.error("Could not remove the incomplete new account.", deleteError);
+}
+}
+console.error("Could not create the cloud account:", error);
+message.style.color = "#b42318";
+message.textContent = error.code === "auth/email-already-in-use"
+? "This email is already registered. Please log in."
+  : "Could not create the cloud account. Check Firebase setup and try again.";
+}
+});
+
+document.getElementById("loginForm")
+.addEventListener("submit", async function(event) {
+event.preventDefault();
+
+const email = document.getElementById("loginEmail")
+.value.trim().toLowerCase();
+const password = document.getElementById("loginPassword").value;
+const role = document.getElementById("loginRole").value;
+const message = document.getElementById("loginMessage");
+
+if (!firebaseServices.configured) {
+try {
+const localAccount = getLocalAccounts().find(account =>
+account.email === email && account.role === role
+);
+let profile = null;
+
+if (localAccount) {
+const salt = Uint8Array.from(atob(localAccount.passwordSalt), character =>
+character.charCodeAt(0)
+);
+const passwordHash = await hashLocalPassword(password, salt);
+if (bytesToBase64(passwordHash) === localAccount.passwordHash) {
+profile = localAccount;
+}
+} else {
+const legacyUser = findLegacyUser(email, password, role);
+if (legacyUser) {
+const crypto = getWebCrypto();
+const salt = crypto.getRandomValues(new Uint8Array(16));
+const passwordHash = await hashLocalPassword(password, salt);
+profile = {
+id: "local-" + bytesToBase64(crypto.getRandomValues(new Uint8Array(16))),
+name: legacyUser.name,
+email: legacyUser.email,
+role: legacyUser.role,
+plateNumber: legacyUser.plateNumber || "",
+passwordSalt: bytesToBase64(salt),
+passwordHash: bytesToBase64(passwordHash)
+};
+saveLocalAccount(profile);
+const legacyUsers = JSON.parse(localStorage.getItem(LEGACY_USERS_KEY) || "[]")
+.filter(account => account.email !== email);
+localStorage.setItem(LEGACY_USERS_KEY, JSON.stringify(legacyUsers));
+}
+}
+
+if (!profile) {
+throw new Error("Invalid email, password, or account type.");
+}
+currentUser = {
+id: profile.id,
+email: profile.email,
+name: profile.name,
+role: profile.role,
+plateNumber: profile.plateNumber || ""
+};
+saveLocalSession(currentUser);
+showDashboard();
+return;
+} catch (error) {
+showLocalError(message, error, "Could not sign in to the local demo account:");
+return;
+}
+}
+
+try {
+let credential;
+let profile;
+let migratedUser = null;
+
+try {
+credential = await firebaseServices.auth
+.signInWithEmailAndPassword(email, password);
+} catch (signInError) {
+const legacyUser = findLegacyUser(email, password, role);
+if (!legacyUser) {
+throw signInError;
+}
+migratedUser = await migrateLegacyUser(legacyUser);
+credential = {
+user: { uid: migratedUser.id, email: migratedUser.email }
+};
+profile = migratedUser;
+}
+
+if (!profile) {
+const userDocument = await firebaseServices.db.collection("users")
+.doc(credential.user.uid).get();
+
+if (userDocument.exists) {
+profile = userDocument.data();
+} else {
+const legacyUser = findLegacyUser(email, password, role);
+if (!legacyUser) {
+await firebaseServices.auth.signOut();
+throw new Error("The Firebase account profile is missing.");
+}
+migratedUser = await migrateLegacyUser(legacyUser, credential.user);
+profile = migratedUser;
+}
+}
+
+if (profile.role !== role) {
+await firebaseServices.auth.signOut();
+message.style.color = "#b42318";
+message.textContent =
+"This account is registered with a different account type.";
+return;
+}
+
+currentUser = {
+id: credential.user.uid,
+email: credential.user.email,
+name: profile.name,
+role: profile.role,
+plateNumber: profile.plateNumber || ""
+};
+showDashboard();
+sendLoginNotification(currentUser);
+if (migratedUser) {
+document.getElementById("emailNotificationMessage").textContent =
+"Your account was moved to shared sign-in. You can now use it on other devices.";
+}
+} catch (error) {
+console.error("Could not sign in to the cloud account:", error);
+message.style.color = "#b42318";
+message.textContent = error.code &&
+error.code.startsWith("auth/")
+? "Invalid login details. Check your email and password."
+  : "Could not load your account. Check Firebase setup and try again.";
+}
+});
+
+async function sendPasswordReset() {
+const emailInput = document.getElementById("loginEmail");
+const email = emailInput.value.trim().toLowerCase();
+const message = document.getElementById("loginMessage");
+
+if (!email) {
+message.style.color = "#b42318";
+message.textContent = "Enter your email address first to reset your password.";
+emailInput.focus();
+return;
+}
+
+if (!firebaseServices.configured) {
+message.style.color = "#b42318";
+message.textContent =
+"Password reset is unavailable until Firebase is configured.";
+return;
+}
+
+message.style.color = "#66756b";
+message.textContent = "Sending password reset link...";
+
+try {
+await firebaseServices.auth.sendPasswordResetEmail(email, getPasswordResetSettings());
+message.style.color = "#087c45";
+message.textContent =
+"If an account exists for this email, Firebase will send a secure password reset link.";
+} catch (error) {
+console.error("Could not send the password reset email:", error);
+message.style.color = "#b42318";
+message.textContent = error.code === "auth/invalid-email"
+? "Enter a valid email address."
+  : "Could not send the reset link. Check the email address and Firebase settings, then try again.";
+}
+}
+
+function getPasswordResetSettings() {
+return {
+url: window.location.origin + window.location.pathname,
+handleCodeInApp: false
+};
+}
+
+function showChangePasswordForm() {
+document.getElementById("changePasswordSection").classList.remove("hidden");
+document.getElementById("showChangePasswordButton").classList.add("hidden");
+document.getElementById("passwordResetEmail").textContent =
+currentUser ? currentUser.email : "";
+document.getElementById("changePasswordMessage").textContent = "";
+}
+
+function hideChangePasswordForm() {
+document.getElementById("changePasswordSection").classList.add("hidden");
+document.getElementById("showChangePasswordButton").classList.remove("hidden");
+document.getElementById("changePasswordMessage").textContent = "";
+}
+
+async function sendDashboardPasswordReset() {
+const message = document.getElementById("changePasswordMessage");
+
+if (!firebaseServices.configured || !currentUser) {
+message.style.color = "#b42318";
+message.textContent = "Please log in again before requesting a password reset.";
+return;
+}
+
+const sendButton = document.getElementById("sendDashboardResetButton");
+sendButton.disabled = true;
+message.style.color = "#66756b";
+message.textContent = "Sending password reset link...";
+
+try {
+await firebaseServices.auth.sendPasswordResetEmail(
+currentUser.email,
+getPasswordResetSettings()
+);
+message.style.color = "#087c45";
+message.textContent =
+"If an account exists for this email, Firebase will send a secure password reset link.";
+} catch (error) {
+console.error("Could not send the password reset link:", error);
+message.style.color = "#b42318";
+message.textContent =
+"Could not send the reset link. Check Firebase settings and try again.";
+} finally {
+sendButton.disabled = false;
+}
+}
+
+async function sendLoginNotification(user) {
+const message = document.getElementById("emailNotificationMessage");
+
+if (!EMAILJS_CONFIG.serviceId ||
+!EMAILJS_CONFIG.templateId ||
+!EMAILJS_CONFIG.publicKey) {
+message.style.color = "#9a6700";
+message.textContent =
+"Login successful. Email notification is not configured yet.";
+return;
+}
+
+message.style.color = "#66756b";
+message.textContent = "Login successful. Sending email notification...";
+
+try {
+const response = await fetch(
+"https://api.emailjs.com/api/v1.0/email/send",
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+service_id: EMAILJS_CONFIG.serviceId,
+template_id: EMAILJS_CONFIG.templateId,
+user_id: EMAILJS_CONFIG.publicKey,
+template_params: {
+to_email: user.email,
+user_name: user.name,
+login_time: new Date().toLocaleString(),
+login_role: user.role
+}
+})
+}
+);
+
+if (!response.ok) {
+throw new Error("EmailJS returned HTTP " + response.status);
+}
+
+message.style.color = "#087c45";
+message.textContent = "A login notification was sent to " + user.email + ".";
+} catch (error) {
+console.error("Could not send login notification:", error);
+message.style.color = "#b42318";
+message.textContent =
+"Login successful, but the email notification could not be sent. Please check the EmailJS configuration.";
+}
+}
+
+function showDashboard() {
+document.getElementById("loginSection").classList.add("hidden");
+document.getElementById("registerSection").classList.add("hidden");
+document.getElementById("dashboardSection").classList.remove("hidden");
+document.getElementById("emailNotificationMessage").textContent = "";
+document.getElementById("continueButton").classList.toggle(
+"hidden",
+firebaseServices.configured && currentUser.role !== "passenger"
+);
+document.getElementById("passwordResetLink").classList.toggle(
+"hidden",
+!firebaseServices.configured
+);
+document.getElementById("showChangePasswordButton").classList.toggle(
+"hidden",
+!firebaseServices.configured
+);
+
+document.getElementById("welcomeName").textContent =
+"Hello, " + currentUser.name + "!";
+
+const isDriver = currentUser.role === "driver";
+
+document.getElementById("welcomeRole").textContent =
+isDriver ? "DRIVER" : "STUDENT / PASSENGER";
+
+document.getElementById("dashboardDetails").textContent =
+isDriver
+? "Tricycle Plate Number: " + currentUser.plateNumber +
+". Your driver account is ready for the demo."
+: "Your passenger account is ready. You can continue to the ride-booking interface.";
+}
+
+function continueToBooking() {
+if (!currentUser) {
+showLogin();
+return;
+}
+
+window.location.href = "login.html";
+}
+
+function logout() {
+currentUser = null;
+if (!firebaseServices.configured) {
+sessionStorage.removeItem(LOCAL_SESSION_KEY);
+}
+document.getElementById("loginForm").reset();
+document.getElementById("registerForm").reset();
+toggleDriverFields();
+showLogin();
+}
+
+toggleDriverFields();
+</script>
+
+</body>
+</html>
